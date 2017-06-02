@@ -12,20 +12,13 @@
 
 ActiveRecord::Schema.define(version: 20170531204642) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "categories", force: :cascade do |t|
     t.string   "category_name"
     t.datetime "created_at",    null: false
     t.datetime "updated_at",    null: false
-  end
-
-  create_table "deliveries", force: :cascade do |t|
-    t.integer  "delivery_type"
-    t.integer  "user_id"
-    t.integer  "listing_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.index ["listing_id"], name: "index_deliveries_on_listing_id"
-    t.index ["user_id"], name: "index_deliveries_on_user_id"
   end
 
   create_table "listings", force: :cascade do |t|
@@ -40,8 +33,8 @@ ActiveRecord::Schema.define(version: 20170531204642) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.string   "image"
-    t.index ["subcategory_id"], name: "index_listings_on_subcategory_id"
-    t.index ["user_id"], name: "index_listings_on_user_id"
+    t.index ["subcategory_id"], name: "index_listings_on_subcategory_id", using: :btree
+    t.index ["user_id"], name: "index_listings_on_user_id", using: :btree
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -51,7 +44,7 @@ ActiveRecord::Schema.define(version: 20170531204642) do
     t.string   "avatar"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_profiles_on_user_id"
+    t.index ["user_id"], name: "index_profiles_on_user_id", using: :btree
   end
 
   create_table "subcategories", force: :cascade do |t|
@@ -59,7 +52,7 @@ ActiveRecord::Schema.define(version: 20170531204642) do
     t.integer  "category_id"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
-    t.index ["category_id"], name: "index_subcategories_on_category_id"
+    t.index ["category_id"], name: "index_subcategories_on_category_id", using: :btree
   end
 
   create_table "trades", force: :cascade do |t|
@@ -67,7 +60,7 @@ ActiveRecord::Schema.define(version: 20170531204642) do
     t.integer  "buyer_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["buyer_id"], name: "index_trades_on_buyer_id"
+    t.index ["buyer_id"], name: "index_trades_on_buyer_id", using: :btree
   end
 
   create_table "users", force: :cascade do |t|
@@ -83,8 +76,13 @@ ActiveRecord::Schema.define(version: 20170531204642) do
     t.string   "last_sign_in_ip"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true, using: :btree
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
   end
 
+  add_foreign_key "listings", "subcategories"
+  add_foreign_key "listings", "users"
+  add_foreign_key "profiles", "users"
+  add_foreign_key "subcategories", "categories"
+  add_foreign_key "trades", "users", column: "buyer_id"
 end
